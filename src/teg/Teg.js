@@ -1,25 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import socketIOClient from "socket.io-client";
 const ENDPOINT = process.env.REACT_APP_BACK;
 const axios = require('axios');
 
-async function getUsuarios() {
-  try {
-    const response = await axios.get(`${ENDPOINT}/usuarios`);
-    console.log(response);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 function Teg() {
 
-  useEffect(() => {
-    getUsuarios()
-    const socket = socketIOClient(ENDPOINT)
-    socket.on("time", time => {
+  const socketRef = useRef()
+
+  const initSocket = () => {
+    socketRef.current = socketIOClient(ENDPOINT)
+    socketRef.current.on("time", time => {
       console.log(time)
     });
+  }
+
+  useEffect(() => {
+    const getUsuarios = async () => {
+      console.log(await axios.get(`${ENDPOINT}/usuarios`))
+    }
+
+    getUsuarios()
+    initSocket()
+
+    return () => {
+      socketRef.current.disconnect();
+    };
   }, []);
 
   return (
