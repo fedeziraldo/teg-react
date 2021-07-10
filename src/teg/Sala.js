@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import socketIOClient from "socket.io-client";
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
@@ -11,6 +11,8 @@ function Sala() {
   const socketRef = useRef()
 
   const [texto, setTexto] = useState("");
+
+  const [usuario, setUsuario] = useState({})
 
   const handleTexto = (event) => {
     setTexto(event.target.value);
@@ -28,9 +30,18 @@ function Sala() {
 
   const initSocket = () => {
     socketRef.current = socketIOClient(ENDPOINT)
-    socketRef.current.on("time", time => {
-      console.log(time)
-    });
+
+    socketRef.current.emit('validacion', localStorage.getItem("token"))
+
+    socketRef.current.on('loginIncorrecto', () => {
+      localStorage.removeItem("token");
+      history.push("/")
+    })
+
+    socketRef.current.on('loginCorrecto', usuario => {
+      setUsuario(usuario)
+    })
+
     socketRef.current.on("texto", texto => document.getElementById("chat").innerHTML += `<li>${texto}</li>`)
   }
 
@@ -49,6 +60,7 @@ function Sala() {
 
   return (
     <div>
+      <div>Hola {usuario.nombre}</div>
       <ul id="chat"></ul>
       <input
         value={texto}
