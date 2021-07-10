@@ -19,13 +19,17 @@ function Sala() {
   };
 
   const enviar = () => {
-    document.getElementById("chat").innerHTML += `<li>${texto}</li>`
+    document.getElementById("chat").innerHTML += `<li>${usuario.nombre}: ${texto}</li>`
     socketRef.current.emit("texto", texto)
   }
 
   const logOut = () => {
     localStorage.removeItem("token");
     history.push("/")
+  }
+
+  const crearSala = () => {
+    socketRef.current.emit("crearSala")
   }
 
   const initSocket = () => {
@@ -67,6 +71,7 @@ function Sala() {
         onChange={handleTexto}
       />
       <button onClick={enviar}>Enviar</button>
+      <button onClick={crearSala}>Crear sala</button>
       <button onClick={logOut}>Salir</button>
     </div>
   );
