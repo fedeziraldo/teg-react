@@ -1,7 +1,8 @@
 import './App.css';
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import Login from './teg/Login';
-import Sala from './teg/Sala';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Login from './teg/Login'
+import Sala from './teg/Sala'
 
 function App() {
   return (

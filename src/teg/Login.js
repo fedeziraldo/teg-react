@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from 'axios';
+import { Form, Button, Container, Alert } from 'react-bootstrap'
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 function Login() {
@@ -14,7 +15,8 @@ function Login() {
 
   const [error, setError] = useState("")
 
-  const login = async () => {
+  const login = async e => {
+    e.preventDefault()
     try {
       const usuToken = await axios.post(`${ENDPOINT}/login/login`, loginForm)
       console.log(usuToken)
@@ -33,33 +35,38 @@ function Login() {
     }
   })
 
-  const handleForm = ({target}) => {
-    const login = {...loginForm}
+  const handleForm = ({ target }) => {
+    const login = { ...loginForm }
     login[target.name] = target.value
     setLoginForm(login)
   }
 
+  const estilos = {
+    backgroundColor: 'white' 
+  }
+
   return (
-    <div>
-      <input
-        placeholder="usuario"
-        name="email"
-        onChange={handleForm}
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="password"
-        onChange={handleForm}
-      />
+    <Container style={estilos}>
+      <Form onSubmit={login}>
+        <Form.Group controlId="formBasicEmail">
+          <Form.Label>Email</Form.Label>
+          <Form.Control placeholder="Ingrese su email" name="email" onChange={handleForm} />
+        </Form.Group>
 
-      <button
-        onClick={login} >
-        Entrar
-      </button>
+        <Form.Group controlId="formBasicPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control type="password" placeholder="Password" name="password" onChange={handleForm} />
+        </Form.Group>
 
-      <div>{error}</div>
-    </div>
+        <Button variant="primary" type="submit">Entrar</Button>
+      </Form>
+      {error &&
+        <Alert variant="danger">
+          {error}
+        </Alert>
+      }
+    </Container>
+
   );
 }
 

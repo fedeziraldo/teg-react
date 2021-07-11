@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import socketIOClient from "socket.io-client";
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { Container, Form, Button } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 function Sala() {
@@ -18,7 +19,8 @@ function Sala() {
     setTexto(event.target.value);
   };
 
-  const enviar = () => {
+  const enviarMensaje = e => {
+    e.preventDefault()
     document.getElementById("chat").innerHTML += `<li>${usuario.nombre}: ${texto}</li>`
     socketRef.current.emit("texto", texto)
   }
@@ -62,18 +64,26 @@ function Sala() {
     };
   }, []);
 
+  const estilos = {
+    backgroundColor: 'white' 
+  }
+
   return (
-    <div>
+    <Container style={estilos}>
       <div>Hola {usuario.nombre}</div>
       <ul id="chat"></ul>
-      <input
-        value={texto}
-        onChange={handleTexto}
-      />
-      <button onClick={enviar}>Enviar</button>
-      <button onClick={crearSala}>Crear sala</button>
-      <button onClick={logOut}>Salir</button>
-    </div>
+      <div>
+        <Form onSubmit={enviarMensaje}>
+          <Form.Group controlId="formBasicEmail">
+            <Form.Control placeholder="Ingrese su manesaje" name="email" onChange={handleTexto} />
+          </Form.Group>
+
+          <Button variant="primary" type="submit">Enviar</Button>
+        </Form>
+        <button onClick={crearSala}>Crear sala</button>
+        <button onClick={logOut}>Salir</button>
+      </div>
+    </Container>
   );
 }
 
