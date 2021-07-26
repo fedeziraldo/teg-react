@@ -2,18 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import socketIOClient from "socket.io-client";
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
+const SIN_SALA = 'sin sala'
 
 function Sala() {
 
   const history = useHistory()
-
   const socketRef = useRef()
-
   const [texto, setTexto] = useState("");
-
   const [usuario, setUsuario] = useState({})
+  const [sala, setSala] = useState(null);
 
   const handleTexto = (event) => {
     setTexto(event.target.value);
@@ -65,24 +64,38 @@ function Sala() {
   }, []);
 
   const estilos = {
-    backgroundColor: 'white' 
+    backgroundColor: 'white'
   }
 
   return (
     <Container style={estilos}>
-      <div>Hola {usuario.nombre}</div>
-      <ul id="chat"></ul>
-      <div>
-        <Form onSubmit={enviarMensaje}>
-          <Form.Group controlId="formBasicEmail">
-            <Form.Control placeholder="Ingrese su manesaje" name="email" onChange={handleTexto} />
-          </Form.Group>
-
-          <Button variant="primary" type="submit">Enviar</Button>
-        </Form>
-        <button onClick={crearSala}>Crear sala</button>
-        <button onClick={logOut}>Salir</button>
-      </div>
+      <Row>
+        <Col>
+          <h2>Hola {usuario.nombre}</h2>
+          <Button variant="danger" onClick={logOut}>Salir</Button>
+        </Col>
+        <Col>
+          <h2>Salas</h2>
+          <h3>Estas unido a la sala {sala ? sala.crador.nombre : SIN_SALA}</h3>
+          <ul id="salas"></ul>
+          <Button variant="primary" onClick={crearSala}>Crear sala</Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h2>Usuarios conectados</h2>
+          <ul id="conectados"></ul>
+        </Col>
+        <Col>
+          <ul id="chat"></ul>
+          <Form onSubmit={enviarMensaje}>
+            <Form.Group controlId="formBasicEmail">
+              <Form.Control placeholder="Ingrese su manesaje" name="email" onChange={handleTexto} />
+            </Form.Group>
+            <Button variant="info" type="submit">Enviar</Button>
+          </Form>
+        </Col>
+      </Row>
     </Container>
   );
 }
