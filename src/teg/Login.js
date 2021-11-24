@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { Form, Button, Container, Alert } from 'react-bootstrap'
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 function Login() {
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -21,7 +21,7 @@ function Login() {
       const usuToken = await axios.post(`${ENDPOINT}/login/login`, loginForm)
       console.log(usuToken)
       localStorage.setItem("token", usuToken.data.token)
-      history.push("/teg")
+      navigate("/teg")
     } catch (e) {
       console.log(e)
       setError(e.response.data)
@@ -31,7 +31,7 @@ function Login() {
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      history.push("/teg")
+      navigate("/teg")
     }
   })
 

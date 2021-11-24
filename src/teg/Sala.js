@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import socketIOClient from "socket.io-client";
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
 const SIN_SALA = 'sin sala'
 
 function Sala() {
 
-  const history = useHistory()
+  const navigate = useNavigate()
   const socketRef = useRef()
   const [texto, setTexto] = useState("");
   const [usuario, setUsuario] = useState({})
@@ -26,7 +26,7 @@ function Sala() {
 
   const logOut = () => {
     localStorage.removeItem("token");
-    history.push("/")
+    navigate("/")
   }
 
   const crearSala = () => {
@@ -40,7 +40,7 @@ function Sala() {
 
     socketRef.current.on('loginIncorrecto', () => {
       localStorage.removeItem("token");
-      history.push("/")
+      navigate("/")
     })
 
     socketRef.current.on('loginCorrecto', usuario => {
