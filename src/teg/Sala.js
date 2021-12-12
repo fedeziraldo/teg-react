@@ -33,26 +33,26 @@ function Sala() {
     socketRef.current.emit("crearSala")
   }
 
-  const initSocket = () => {
-    socketRef.current = socketIOClient(ENDPOINT)
-
-    socketRef.current.emit('validacion', localStorage.getItem("token"))
-
-    socketRef.current.on('loginIncorrecto', () => {
-      localStorage.removeItem("token");
-      navigate("/")
-    })
-
-    socketRef.current.on('loginCorrecto', usuario => {
-      setUsuario(usuario)
-    })
-
-    socketRef.current.on("texto", texto => document.getElementById("chat").innerHTML += `<li>${texto}</li>`)
-  }
-
   useEffect(() => {
     const getUsuarios = async () => {
       console.log(await axios.get(`${ENDPOINT}/usuarios`))
+    }
+
+    const initSocket = () => {
+      socketRef.current = socketIOClient(ENDPOINT)
+  
+      socketRef.current.emit('validacion', localStorage.getItem("token"))
+  
+      socketRef.current.on('loginIncorrecto', () => {
+        localStorage.removeItem("token");
+        navigate("/")
+      })
+  
+      socketRef.current.on('loginCorrecto', usuario => {
+        setUsuario(usuario)
+      })
+  
+      socketRef.current.on("texto", texto => document.getElementById("chat").innerHTML += `<li>${texto}</li>`)
     }
 
     getUsuarios()
@@ -61,7 +61,7 @@ function Sala() {
     return () => {
       socketRef.current.disconnect();
     };
-  }, []);
+  }, [navigate]);
 
   const estilos = {
     backgroundColor: 'white'

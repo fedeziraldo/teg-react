@@ -13,16 +13,20 @@ function Login() {
     password: ""
   })
 
+  const [isLoadingEntrar, setLoadingEntrar] = useState(false)
+
   const [error, setError] = useState("")
 
   const login = async e => {
     e.preventDefault()
+    setLoadingEntrar(true)
     try {
       const usuToken = await axios.post(`${ENDPOINT}/login/login`, loginForm)
       console.log(usuToken)
       localStorage.setItem("token", usuToken.data.token)
       navigate("/teg")
     } catch (e) {
+      setLoadingEntrar(false)
       console.log(e)
       setError(e.response.data)
     }
@@ -58,7 +62,13 @@ function Login() {
           <Form.Control type="password" placeholder="Password" name="password" onChange={handleForm} />
         </Form.Group>
 
-        <Button variant="primary" type="submit">Entrar</Button>
+        <Button variant="primary" type="submit" disabled={isLoadingEntrar}>
+          {isLoadingEntrar ?
+            "Loading..."
+            :
+            "Entrar"
+          }
+        </Button>
       </Form>
       {error &&
         <Alert variant="danger">
