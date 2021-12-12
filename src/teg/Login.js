@@ -24,7 +24,7 @@ function Login() {
       const usuToken = await axios.post(`${ENDPOINT}/login/login`, loginForm)
       console.log(usuToken)
       localStorage.setItem("token", usuToken.data.token)
-      navigate("/teg")
+      navigate("/sala")
     } catch (e) {
       setLoadingEntrar(false)
       console.log(e)
@@ -35,7 +35,7 @@ function Login() {
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      navigate("/teg")
+      navigate("/sala")
     }
   })
 
