@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
-const SIN_SALA = 'sin sala'
 
 function Sala() {
 
@@ -12,7 +11,10 @@ function Sala() {
   const socketRef = useRef()
   const [texto, setTexto] = useState("");
   const [usuario, setUsuario] = useState({})
+  const [usuarios, setUsuarios] = useState([])
   const [sala, setSala] = useState(null);
+  const [salas, setSalas] = useState([]);
+  const [isLoading, setLoading] = useState(true)
 
   const handleTexto = (event) => {
     setTexto(event.target.value);
@@ -48,8 +50,11 @@ function Sala() {
         navigate("/")
       })
   
-      socketRef.current.on('loginCorrecto', usuario => {
+      socketRef.current.on('loginCorrecto', ({usuario, salas, usuarios}) => {
         setUsuario(usuario)
+        setSalas(salas)
+        setUsuarios(usuarios)
+        setLoading(false)
       })
   
       socketRef.current.on("texto", texto => document.getElementById("chat").innerHTML += `<li>${texto}</li>`)
@@ -72,19 +77,27 @@ function Sala() {
       <Row>
         <Col>
           <h2>Hola {usuario.nombre}</h2>
-          <Button variant="danger" onClick={logOut}>Salir</Button>
+          <Button variant="danger" onClick={logOut} disabled={isLoading}>Salir</Button>
         </Col>
         <Col>
           <h2>Salas</h2>
-          <h3>Estas unido a la sala {sala ? sala.crador.nombre : SIN_SALA}</h3>
-          <ul id="salas"></ul>
-          <Button variant="primary" onClick={crearSala}>Crear sala</Button>
+          <h3>Estas unido a la sala {usuario && usuario.nombreSala}</h3>
+          <ul>
+            {
+              salas.map(s => <li>{s}</li>)
+            }
+          </ul>
+          <Button variant="primary" onClick={crearSala} disabled={isLoading}>Crear sala</Button>
         </Col>
       </Row>
       <Row>
         <Col>
           <h2>Usuarios conectados</h2>
-          <ul id="conectados"></ul>
+          <ul>
+            {
+              usuarios.map(u => <li>{u}</li>)
+            }
+          </ul>
         </Col>
         <Col>
           <ul id="chat"></ul>
@@ -92,7 +105,7 @@ function Sala() {
             <Form.Group controlId="formBasicEmail">
               <Form.Control placeholder="Ingrese su manesaje" name="email" onChange={handleTexto} />
             </Form.Group>
-            <Button variant="info" type="submit">Enviar</Button>
+            <Button variant="info" type="submit" disabled={isLoading}>Enviar</Button>
           </Form>
         </Col>
       </Row>
