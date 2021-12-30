@@ -45,8 +45,8 @@ function Sala() {
     socketRef.current.emit("eliminarSala")
   }
 
-  const irAMapa = () => {
-    navigate("/mapa")
+  const iniciarJuego = () => {
+    socketRef.current.emit("iniciarJuego")
   }
 
   useEffect(() => {
@@ -55,7 +55,7 @@ function Sala() {
     }
 
     const initSocket = () => {
-      socketRef.current = socketIOClient(ENDPOINT)
+      socketRef.current = socketIOClient(`${ENDPOINT}/sala`)
   
       socketRef.current.emit('validacion', localStorage.getItem("token"))
   
@@ -83,6 +83,10 @@ function Sala() {
   
       socketRef.current.on("texto", texto => {
         document.getElementById("chat").innerHTML += `<li>${texto}</li>`
+      })
+
+      socketRef.current.on("iniciarJuego", texto => {
+        navigate("/mapa")
       })
     }
 
@@ -121,7 +125,7 @@ function Sala() {
             salas.includes(usuario._id) ?
               <>
                 <Button variant="danger" onClick={eliminarSala} disabled={isLoading}>Eliminar sala</Button>
-                <Button variant="warning" onClick={irAMapa} disabled={isLoading}>Iniciar juego</Button>
+                <Button variant="warning" onClick={iniciarJuego} disabled={isLoading}>Iniciar juego</Button>
               </> :
               <Button variant="danger" onClick={salirSala} disabled={isLoading}>Salir sala</Button>
           }
