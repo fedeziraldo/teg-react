@@ -10,7 +10,7 @@ function Sala() {
   const navigate = useNavigate()
   const socketRef = useRef()
   const [texto, setTexto] = useState("");
-  const [usuario, setUsuario] = useState({})
+  const [jugador, setJugador] = useState({})
   const [usuarios, setUsuarios] = useState([])
   const [salas, setSalas] = useState([]);
   const [isLoading, setLoading] = useState(true)
@@ -64,8 +64,8 @@ function Sala() {
         navigate("/")
       })
   
-      socketRef.current.on('loginCorrecto', usuario => {
-        setUsuario(usuario)
+      socketRef.current.on('loginCorrecto', jugador => {
+        setJugador(jugador)
         setLoading(false)
       })
 
@@ -77,15 +77,15 @@ function Sala() {
         setUsuarios(usuarios)
       })
 
-      socketRef.current.on('usuario', usuario => {
-        setUsuario(usuario)
+      socketRef.current.on('jugador', jugador => {
+        setJugador(jugador)
       })
   
       socketRef.current.on("texto", texto => {
         document.getElementById("chat").innerHTML += `<li>${texto}</li>`
       })
 
-      socketRef.current.on("iniciarJuego", texto => {
+      socketRef.current.on("iniciarJuego", () => {
         navigate("/mapa")
       })
     }
@@ -106,12 +106,12 @@ function Sala() {
     <Container style={estilos}>
       <Row>
         <Col>
-          <h2>Hola {usuario.nombre}</h2>
+          <h2>Hola {jugador.nombre}</h2>
           <Button variant="danger" onClick={logOut} disabled={isLoading}>Salir</Button>
         </Col>
         <Col>
           <h2>Salas</h2>
-          <h3>Estas unido a la sala {usuario.nombreSala}</h3>
+          <h3>Estas unido a la sala {jugador.nombreSala}</h3>
           <ListGroup variant="flush">
             {
               salas.map(s => 
@@ -122,7 +122,7 @@ function Sala() {
           </ListGroup>
           <Button variant="success" onClick={crearSala} disabled={isLoading}>Crear sala</Button>
           {
-            salas.includes(usuario._id) ?
+            salas.includes(jugador.usuario && jugador.usuario._id) ?
               <>
                 <Button variant="danger" onClick={eliminarSala} disabled={isLoading}>Eliminar sala</Button>
                 <Button variant="warning" onClick={iniciarJuego} disabled={isLoading}>Iniciar juego</Button>
