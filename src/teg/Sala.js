@@ -2,17 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import socketIOClient from "socket.io-client";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import { Container, Form, Button, Row, Col, ListGroup } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
-const SIN_SALA = 'sin sala'
 
 function Sala() {
 
   const navigate = useNavigate()
   const socketRef = useRef()
   const [texto, setTexto] = useState("");
-  const [usuario, setUsuario] = useState({})
-  const [sala, setSala] = useState(null);
+  const [jugador, setJugador] = useState({})
+  const [usuarios, setUsuarios] = useState([])
+  const [salas, setSalas] = useState([]);
+  const [isLoading, setLoading] = useState(true)
 
   const handleTexto = (event) => {
     setTexto(event.target.value);
@@ -20,7 +21,6 @@ function Sala() {
 
   const enviarMensaje = e => {
     e.preventDefault()
-    document.getElementById("chat").innerHTML += `<li>${usuario.nombre}: ${texto}</li>`
     socketRef.current.emit("texto", texto)
   }
 
@@ -33,13 +33,29 @@ function Sala() {
     socketRef.current.emit("crearSala")
   }
 
+  const unirseSala = sala => {
+    socketRef.current.emit("unirseSala", sala)
+  }
+
+  const salirSala = () => {
+    socketRef.current.emit("salirSala")
+  }
+
+  const eliminarSala = () => {
+    socketRef.current.emit("eliminarSala")
+  }
+
+  const iniciarJuego = () => {
+    socketRef.current.emit("iniciarJuego")
+  }
+
   useEffect(() => {
     const getUsuarios = async () => {
       console.log(await axios.get(`${ENDPOINT}/usuarios`))
     }
 
     const initSocket = () => {
-      socketRef.current = socketIOClient(ENDPOINT)
+      socketRef.current = socketIOClient(`${ENDPOINT}/sala`)
   
       socketRef.current.emit('validacion', localStorage.getItem("token"))
   
@@ -48,11 +64,30 @@ function Sala() {
         navigate("/")
       })
   
-      socketRef.current.on('loginCorrecto', usuario => {
-        setUsuario(usuario)
+      socketRef.current.on('loginCorrecto', jugador => {
+        setJugador(jugador)
+        setLoading(false)
+      })
+
+      socketRef.current.on('salas', salas => {
+        setSalas(salas)
+      })
+
+      socketRef.current.on('usuarios', usuarios => {
+        setUsuarios(usuarios)
+      })
+
+      socketRef.current.on('jugador', jugador => {
+        setJugador(jugador)
       })
   
-      socketRef.current.on("texto", texto => document.getElementById("chat").innerHTML += `<li>${texto}</li>`)
+      socketRef.current.on("texto", texto => {
+        document.getElementById("chat").innerHTML += `<li>${texto}</li>`
+      })
+
+      socketRef.current.on("iniciarJuego", () => {
+        navigate("/mapa")
+      })
     }
 
     getUsuarios()
@@ -71,20 +106,39 @@ function Sala() {
     <Container style={estilos}>
       <Row>
         <Col>
-          <h2>Hola {usuario.nombre}</h2>
-          <Button variant="danger" onClick={logOut}>Salir</Button>
+          <h2>Hola {jugador.nombre}</h2>
+          <Button variant="danger" onClick={logOut} disabled={isLoading}>Salir</Button>
         </Col>
         <Col>
           <h2>Salas</h2>
-          <h3>Estas unido a la sala {sala ? sala.crador.nombre : SIN_SALA}</h3>
-          <ul id="salas"></ul>
-          <Button variant="primary" onClick={crearSala}>Crear sala</Button>
+          <h3>Estas unido a la sala {jugador.nombreSala}</h3>
+          <ListGroup variant="flush">
+            {
+              salas.map(s => 
+              <ListGroup.Item>{s}
+                <Button variant="primary" onClick={() => unirseSala(s)} disabled={isLoading}>Unirse a sala</Button>
+              </ListGroup.Item>
+            )}
+          </ListGroup>
+          <Button variant="success" onClick={crearSala} disabled={isLoading}>Crear sala</Button>
+          {
+            salas.includes(jugador.usuario && jugador.usuario._id) ?
+              <>
+                <Button variant="danger" onClick={eliminarSala} disabled={isLoading}>Eliminar sala</Button>
+                <Button variant="warning" onClick={iniciarJuego} disabled={isLoading}>Iniciar juego</Button>
+              </> :
+              <Button variant="danger" onClick={salirSala} disabled={isLoading}>Salir sala</Button>
+          }
         </Col>
       </Row>
       <Row>
         <Col>
           <h2>Usuarios conectados</h2>
-          <ul id="conectados"></ul>
+          <ListGroup variant="flush">
+            {
+              usuarios.map(u => <ListGroup.Item>{u}</ListGroup.Item>)
+            }
+          </ListGroup>
         </Col>
         <Col>
           <ul id="chat"></ul>
@@ -92,7 +146,7 @@ function Sala() {
             <Form.Group controlId="formBasicEmail">
               <Form.Control placeholder="Ingrese su manesaje" name="email" onChange={handleTexto} />
             </Form.Group>
-            <Button variant="info" type="submit">Enviar</Button>
+            <Button variant="info" type="submit" disabled={isLoading}>Enviar</Button>
           </Form>
         </Col>
       </Row>
