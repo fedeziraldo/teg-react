@@ -33,6 +33,7 @@ function Mapa() {
   const socketRef = useRef()
 
   const [jugador, setJugador] = useState({})
+  const [paises, setPaises] = useState([])
   const [iniciarJuego, setIniciarJuego] = useState(false)
   const navigate = useNavigate()
 
@@ -51,8 +52,12 @@ function Mapa() {
         setJugador(jugador)
       })
 
-      socketRef.current.on('iniciarJuego', usuario => {
+      socketRef.current.on('iniciarJuego', () => {
         setIniciarJuego(true)
+      })
+
+      socketRef.current.on('paises', paises => {
+        setPaises(paises)
       })
     }
 
@@ -69,11 +74,21 @@ function Mapa() {
         <Layer>
           <Image
             image={image}
-            ref={(node) => { drawHitFromCache(node); }}
+            ref={node => { drawHitFromCache(node); }}
             width={300}
             height={150}
           />
         </Layer>
+
+        {
+          paises.map(p => 
+            <Image 
+              image={p.nombre}
+              ref={node => { drawHitFromCache(node); }}
+              width={300}
+              height={150}
+            />)
+        }
       </Stage>
       :
       <Alert variant="info">
