@@ -7,22 +7,28 @@ import useImage from 'use-image';
 import { Alert } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
-const drawHitFromCache = (img) => {
-  if (img) {
-    img.off('click');
-    img.on("click", () => {
-      alert("lau cochi te amo")
-    })
-    img.cache();
-    img.filters([Konva.Filters.RGB]);
-    img["red"](128)
-    img.drawHitFromCache();
-  }
-};
+const colores = [
+  {red: 255},
+  {green: 255},
+  {blue: 255},
+  {red: 255, green: 255},
+  {red: 255, blue: 255},
+  {green: 255, blue: 255},
+]
 
 function Mapa() {
 
-  const [image] = useImage('Etiopia.png');
+  const image = useImage('Etiopia.png')[0];
+  
+  const images = {}
+  images['ANGOLA.png'] = useImage('ANGOLA.png')[0]
+  images['EGIPTO.png'] = useImage('EGIPTO.png')[0]
+  images['ETIOPIA.png'] = useImage('ETIOPIA.png')[0]
+  images['MADAGASCAR.png'] = useImage('MADAGASCAR.png')[0]
+  images['MAURITANIA.png'] = useImage('MAURITANIA.png')[0]
+  images['NIGERIA.png'] = useImage('NIGERIA.png')[0]
+  images['SAHARA.png'] = useImage('SAHARA.png')[0]
+  images['SUDAFRICA.png'] = useImage('SUDAFRICA.png')[0]
 
   const styleMapa = {
     backgroundImage: 'url("mapa.jpg")',
@@ -33,9 +39,26 @@ function Mapa() {
   const socketRef = useRef()
 
   const [jugador, setJugador] = useState({})
+  const [jugadores, setJugadores] = useState([])
   const [paises, setPaises] = useState([])
   const [iniciarJuego, setIniciarJuego] = useState(false)
   const navigate = useNavigate()
+
+  const drawHitFromCache = (img, p) => {
+    if (img) {
+      img.off('click');
+      img.on("click", () => {
+        alert("lau cochi te amo")
+      })
+      img.cache();
+      img.filters([Konva.Filters.RGB]);
+      // img["red"](128)
+      img["red"](colores[p.jugador.numero].red)
+      img["green"](colores[p.jugador.numero].green)
+      img["blue"](colores[p.jugador.numero].blue)
+      img.drawHitFromCache();
+    }
+  };
 
   useEffect(() => {
     const initSocket = () => {
@@ -52,12 +75,18 @@ function Mapa() {
         setJugador(jugador)
       })
 
-      socketRef.current.on('iniciarJuego', () => {
+      socketRef.current.on('iniciarJuego', juego => {
         setIniciarJuego(true)
+        setPaises(juego.paises)
+        setJugadores(juego.jugadores)
       })
 
       socketRef.current.on('paises', paises => {
-        setPaises(paises)
+        // for (let pais of paises) {
+        //   const img = {...images}
+        //   img[pais.archivo] = useImage(pais.archivo)
+        //   setImages(img)
+        // }
       })
     }
 
@@ -72,23 +101,18 @@ function Mapa() {
     iniciarJuego ?
       <Stage width={1600} height={1182} style={styleMapa}>
         <Layer>
-          <Image
-            image={image}
-            ref={node => { drawHitFromCache(node); }}
-            width={300}
-            height={150}
-          />
-        </Layer>
-
         {
           paises.map(p => 
             <Image 
-              image={p.nombre}
-              ref={node => { drawHitFromCache(node); }}
-              width={300}
-              height={150}
+              x={p.pais.posX}
+              y={p.pais.posY}
+              image={images[p.pais.archivo]}
+              ref={node => { drawHitFromCache(node, p) }}
+              width={p.pais.width||200}
+              height={p.pais.height||200}
             />)
         }
+        </Layer>
       </Stage>
       :
       <Alert variant="info">
