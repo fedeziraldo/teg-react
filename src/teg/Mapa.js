@@ -4,22 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import Konva from 'konva';
 import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
-import { Alert } from 'react-bootstrap';
+import { Alert, Button, Form } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 const colores = [
-  {red: 255},
-  {green: 255},
-  {blue: 255},
-  {red: 255, green: 255},
-  {red: 255, blue: 255},
-  {green: 255, blue: 255},
+  { red: 255 },
+  { green: 255 },
+  { blue: 255 },
+  { red: 255, green: 255 },
+  { red: 255, blue: 255 },
+  { green: 255, blue: 255 },
 ]
 
 function Mapa() {
 
-  const image = useImage('Etiopia.png')[0];
-  
   const images = {}
   images['ANGOLA.png'] = useImage('ANGOLA.png')[0]
   images['EGIPTO.png'] = useImage('EGIPTO.png')[0]
@@ -42,22 +40,37 @@ function Mapa() {
   const [jugadores, setJugadores] = useState([])
   const [paises, setPaises] = useState([])
   const [iniciarJuego, setIniciarJuego] = useState(false)
+  const [ataque, setAtaque] = useState({})
   const navigate = useNavigate()
+
+  const handleAtaque = e => {
+    const a = { ...ataque }
+    a[e.target.name] = e.target.value
+    setAtaque(a);
+  };
 
   const drawHitFromCache = (img, p) => {
     if (img) {
       img.off('click');
       img.on("click", () => {
-        alert("lau cochi te amo")
+        socketRef.current.emit('accionSimple', p.numero)
       })
       img.cache();
       img.filters([Konva.Filters.RGB]);
-      // img["red"](128)
       img["red"](colores[p.jugador.numero].red)
       img["green"](colores[p.jugador.numero].green)
       img["blue"](colores[p.jugador.numero].blue)
       img.drawHitFromCache();
     }
+  };
+
+  const accionTerminarTurno = () => {
+    socketRef.current.emit('accionTerminarTurno')
+  };
+
+  const atacar = e => {
+    e.preventDefault()
+    socketRef.current.emit('accionDoble', ataque.numeroPaisO, ataque.numeroPaisD)
   };
 
   useEffect(() => {
@@ -99,21 +112,36 @@ function Mapa() {
 
   return (
     iniciarJuego ?
-      <Stage width={1600} height={1182} style={styleMapa}>
-        <Layer>
-        {
-          paises.map(p => 
-            <Image 
-              x={p.pais.posX}
-              y={p.pais.posY}
-              image={images[p.pais.archivo]}
-              ref={node => { drawHitFromCache(node, p) }}
-              width={p.pais.width||200}
-              height={p.pais.height||200}
-            />)
-        }
-        </Layer>
-      </Stage>
+      <>
+        <Button variant="danger" onClick={accionTerminarTurno}>Terminar turno</Button>
+        <Form onSubmit={atacar}>
+          <Form.Group controlId="formBasicEmail">
+            <Form.Control type="number" placeholder="paisO" name="numeroPaisO" onChange={handleAtaque} />
+          </Form.Group>
+
+          <Form.Group controlId="formBasicPassword">
+            <Form.Control type="number" placeholder="paisO" name="numeroPaisD" onChange={handleAtaque} />
+          </Form.Group>
+
+          <Button variant="info" type="submit" onClick={atacar}>Ataca</Button>
+        </Form>
+        <Stage width={1600} height={1182} style={styleMapa}>
+          <Layer>
+            {
+              paises.map(p =>
+                <Image key={p.numero}
+                  x={p.pais.posX}
+                  y={p.pais.posY}
+                  draggable
+                  image={images[p.pais.archivo]}
+                  ref={node => drawHitFromCache(node, p)}
+                  width={p.pais.width || 200}
+                  height={p.pais.height || 200}
+                />)
+            }
+          </Layer>
+        </Stage>
+      </>
       :
       <Alert variant="info">
         waiting for other players

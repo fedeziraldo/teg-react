@@ -115,7 +115,7 @@ function Sala() {
           <ListGroup variant="flush">
             {
               salas.map(s => 
-              <ListGroup.Item>{s}
+              <ListGroup.Item key={s}>{s}
                 <Button variant="primary" onClick={() => unirseSala(s)} disabled={isLoading}>Unirse a sala</Button>
               </ListGroup.Item>
             )}
@@ -136,7 +136,7 @@ function Sala() {
           <h2>Usuarios conectados</h2>
           <ListGroup variant="flush">
             {
-              usuarios.map(u => <ListGroup.Item>{u}</ListGroup.Item>)
+              usuarios.map(u => <ListGroup.Item key={u}>{u}</ListGroup.Item>)
             }
           </ListGroup>
         </Col>
