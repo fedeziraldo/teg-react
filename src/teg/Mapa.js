@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Konva from 'konva';
 import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
-import { Alert, Button, Form } from 'react-bootstrap';
+import { Alert, Button, Form, ListGroup, Container } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 const colores = [
@@ -57,9 +57,10 @@ function Mapa() {
       })
       img.cache();
       img.filters([Konva.Filters.RGB]);
-      img["red"](colores[p.jugador.numero].red)
-      img["green"](colores[p.jugador.numero].green)
-      img["blue"](colores[p.jugador.numero].blue)
+      const color = colores[p.jugador.numero]
+      img["red"](color.red)
+      img["green"](color.green)
+      img["blue"](color.blue)
       img.drawHitFromCache();
     }
   };
@@ -110,9 +111,20 @@ function Mapa() {
     };
   }, [navigate]);
 
+  const estilos = {
+    backgroundColor: 'white',
+    margin: '0px'
+  }
+
   return (
     iniciarJuego ?
-      <>
+      <Container style={estilos}>
+        Hola {jugador.usuario && jugador.usuario.email}
+        <ListGroup variant="flush">
+            {
+              jugadores.map(j => <ListGroup.Item key={j._id}>{j._id}</ListGroup.Item>)
+            }
+        </ListGroup>
         <Button variant="danger" onClick={accionTerminarTurno}>Terminar turno</Button>
         <Form onSubmit={atacar}>
           <Form.Group controlId="formBasicEmail">
@@ -141,7 +153,7 @@ function Mapa() {
             }
           </Layer>
         </Stage>
-      </>
+      </Container>
       :
       <Alert variant="info">
         waiting for other players

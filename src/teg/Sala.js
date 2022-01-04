@@ -106,7 +106,7 @@ function Sala() {
     <Container style={estilos}>
       <Row>
         <Col>
-          <h2>Hola {jugador.nombre}</h2>
+          <h2>Hola {jugador.usuario && jugador.usuario.email}</h2>
           <Button variant="danger" onClick={logOut} disabled={isLoading}>Salir</Button>
         </Col>
         <Col>
