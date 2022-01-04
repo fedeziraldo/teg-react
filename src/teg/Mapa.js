@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Image } from 'react-konva';
+import { Stage, Layer, Image, Text } from 'react-konva';
 import { useNavigate } from 'react-router-dom';
 import Konva from 'konva';
 import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
 import { Alert, Button, Form, ListGroup, Container } from 'react-bootstrap';
+import JugadaInvalida from './JugadaInvalida';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 const colores = [
@@ -41,6 +42,9 @@ function Mapa() {
   const [paises, setPaises] = useState([])
   const [iniciarJuego, setIniciarJuego] = useState(false)
   const [ataque, setAtaque] = useState({})
+
+  const [show, setShow] = useState(false)
+  const [jugadaInvalida, setJugadaInvalida] = useState("")
   const navigate = useNavigate()
 
   const handleAtaque = e => {
@@ -102,6 +106,11 @@ function Mapa() {
         //   setImages(img)
         // }
       })
+
+      socketRef.current.on('jugadaInvalida', mensaje => {
+        setShow(true)
+        setJugadaInvalida(mensaje)
+      })
     }
 
     initSocket()
@@ -121,9 +130,9 @@ function Mapa() {
       <Container style={estilos}>
         Hola {jugador.usuario && jugador.usuario.email}
         <ListGroup variant="flush">
-            {
-              jugadores.map(j => <ListGroup.Item key={j._id}>{j._id}</ListGroup.Item>)
-            }
+          {
+            jugadores.map(j => <ListGroup.Item key={j.usuario._id}>{j.usuario._id}</ListGroup.Item>)
+          }
         </ListGroup>
         <Button variant="danger" onClick={accionTerminarTurno}>Terminar turno</Button>
         <Form onSubmit={atacar}>
@@ -141,18 +150,37 @@ function Mapa() {
           <Layer>
             {
               paises.map(p =>
-                <Image key={p.numero}
-                  x={p.pais.posX}
-                  y={p.pais.posY}
-                  draggable
-                  image={images[p.pais.archivo]}
-                  ref={node => drawHitFromCache(node, p)}
-                  width={p.pais.width || 200}
-                  height={p.pais.height || 200}
-                />)
+                <>
+                  <Image key={p.pais.numero}
+                    x={p.pais.posX}
+                    y={p.pais.posY}
+                    draggable
+                    image={images[p.pais.archivo]}
+                    ref={node => drawHitFromCache(node, p)}
+                    width={p.pais.width || 200}
+                    height={p.pais.height || 200}
+                  />
+                  <Text
+                    x={p.pais.posX}
+                    y={p.pais.posY}
+                    text={`fichas: ${p.fichas}`}
+                  >
+                  </Text>
+                  <Text
+                    x={p.pais.posX + 20}
+                    y={p.pais.posY}
+                    text={`misiles: ${p.misiles}`}
+                  >
+                  </Text>
+                </>)
             }
           </Layer>
         </Stage>
+        <JugadaInvalida
+          mensaje={jugadaInvalida}
+          show={show}
+          setShow={setShow}
+        />
       </Container>
       :
       <Alert variant="info">
