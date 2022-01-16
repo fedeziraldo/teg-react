@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Image, Text } from 'react-konva';
 import { useNavigate } from 'react-router-dom';
 import Konva from 'konva';
@@ -28,6 +28,8 @@ function Mapa() {
   images['NIGERIA.png'] = useImage('NIGERIA.png')[0]
   images['SAHARA.png'] = useImage('SAHARA.png')[0]
   images['SUDAFRICA.png'] = useImage('SUDAFRICA.png')[0]
+  images['CUBA.png'] = useImage('CUBA.png')[0]
+  images['EL_SALVADOR.png'] = useImage('EL_SALVADOR.png')[0]
 
   const styleMapa = {
     backgroundImage: 'url("mapa.jpg")',
@@ -38,8 +40,12 @@ function Mapa() {
   const socketRef = useRef()
 
   const [jugador, setJugador] = useState({})
-  const [jugadores, setJugadores] = useState([])
-  const [paises, setPaises] = useState([])
+
+  const [juego, setJuego] = useState({
+    jugadores: [],
+    paises: [],
+    turno: {}
+  })
   const [iniciarJuego, setIniciarJuego] = useState(false)
   const [ataque, setAtaque] = useState({})
 
@@ -55,10 +61,6 @@ function Mapa() {
 
   const drawHitFromCache = (img, p) => {
     if (img) {
-      img.off('click');
-      img.on("click", () => {
-        socketRef.current.emit('accionSimple', p.numero)
-      })
       img.cache();
       img.filters([Konva.Filters.RGB]);
       const color = colores[p.jugador.numero]
@@ -68,6 +70,15 @@ function Mapa() {
       img.drawHitFromCache();
     }
   };
+
+  const accionSimple = (text, misil, p) => {
+    if (text) {
+      text.off('click');
+      text.on("click", () => {
+        socketRef.current.emit('accionSimple', p.pais.numero, misil)
+      })
+    }
+  }
 
   const accionTerminarTurno = () => {
     socketRef.current.emit('accionTerminarTurno')
@@ -95,16 +106,11 @@ function Mapa() {
 
       socketRef.current.on('iniciarJuego', juego => {
         setIniciarJuego(true)
-        setPaises(juego.paises)
-        setJugadores(juego.jugadores)
+        setJuego(juego)
       })
 
-      socketRef.current.on('paises', paises => {
-        // for (let pais of paises) {
-        //   const img = {...images}
-        //   img[pais.archivo] = useImage(pais.archivo)
-        //   setImages(img)
-        // }
+      socketRef.current.on('juego', juego => {
+        setJuego(juego)
       })
 
       socketRef.current.on('jugadaInvalida', mensaje => {
@@ -128,51 +134,90 @@ function Mapa() {
   return (
     iniciarJuego ?
       <Container style={estilos}>
-        Hola {jugador.usuario && jugador.usuario.email}
+        Hola {jugador.nombre}
         <ListGroup variant="flush">
           {
-            jugadores.map(j => <ListGroup.Item key={j.usuario._id}>{j.usuario._id}</ListGroup.Item>)
+            juego.jugadores.map(j => <ListGroup.Item key={j.nombre}>{j.nombre}</ListGroup.Item>)
           }
         </ListGroup>
         <Button variant="danger" onClick={accionTerminarTurno}>Terminar turno</Button>
         <Form onSubmit={atacar}>
-          <Form.Group controlId="formBasicEmail">
-            <Form.Control type="number" placeholder="paisO" name="numeroPaisO" onChange={handleAtaque} />
-          </Form.Group>
+          <Form.Select name="numeroPaisO" onChange={handleAtaque}>
+            {
+              juego.paises.map(p => <option value={p.pais.numero}>{p.pais.nombre}</option>)
+            }
+          </Form.Select>
 
-          <Form.Group controlId="formBasicPassword">
-            <Form.Control type="number" placeholder="paisO" name="numeroPaisD" onChange={handleAtaque} />
-          </Form.Group>
+          <Form.Select name="numeroPaisD" onChange={handleAtaque}>
+            {
+              juego.paises.map(p => <option value={p.pais.numero}>{p.pais.nombre}</option>)
+            }
+          </Form.Select>
 
           <Button variant="info" type="submit" onClick={atacar}>Ataca</Button>
         </Form>
+        <Alert>
+
+          Fase {
+            juego.turno.faseInicial && "Inicial"
+          }
+          {
+            juego.turno.fase4 && "4"
+          }
+          {
+            juego.turno.fase8 && "8"
+          }
+          {
+            juego.turno.faseJuego && "Juego"
+          }
+          {
+            juego.turno.faseReagrupar && "Reagrupar"
+          }
+          {
+            juego.turno.faseRefuerzos && "Refuerzos"
+          }
+        </Alert>
+        <Alert>
+          Turno {juego.jugadores[juego.turno.turno % juego.jugadores.length] &&
+            juego.jugadores[juego.turno.turno % juego.jugadores.length].nombre}
+        </Alert>
+        <Alert>
+          Fichas restantes {jugador.fichasRestantes}
+        </Alert>
         <Stage width={1600} height={1182} style={styleMapa}>
           <Layer>
             {
-              paises.map(p =>
-                <>
-                  <Image key={p.pais.numero}
-                    x={p.pais.posX}
-                    y={p.pais.posY}
-                    draggable
-                    image={images[p.pais.archivo]}
-                    ref={node => drawHitFromCache(node, p)}
-                    width={p.pais.width || 200}
-                    height={p.pais.height || 200}
-                  />
+              juego.paises.map(p =>
+                <Image key={p.pais.numero}
+                  x={p.pais.posX}
+                  y={p.pais.posY}
+                  image={images[p.pais.archivo]}
+                  ref={node => drawHitFromCache(node, p)}
+                  width={p.pais.width || 200}
+                  height={p.pais.height || 200}
+                />)
+            }
+
+            {
+              juego.paises.map(p =>
+                <Fragment key={p.pais.numero}>
                   <Text
                     x={p.pais.posX}
                     y={p.pais.posY}
                     text={`fichas: ${p.fichas}`}
+                    ref={node => accionSimple(node, false, p)}
+                    draggable
                   >
                   </Text>
                   <Text
-                    x={p.pais.posX + 20}
-                    y={p.pais.posY}
+                    x={p.pais.posX}
+                    y={p.pais.posY + 20}
                     text={`misiles: ${p.misiles}`}
+                    ref={node => accionSimple(node, true, p)}
+                    draggable
                   >
                   </Text>
-                </>)
+                </Fragment>)
             }
           </Layer>
         </Stage>
