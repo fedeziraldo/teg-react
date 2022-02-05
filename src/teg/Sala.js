@@ -22,6 +22,7 @@ function Sala() {
   const enviarMensaje = e => {
     e.preventDefault()
     socketRef.current.emit("texto", texto)
+    setTexto("")
   }
 
   const logOut = () => {
@@ -45,8 +46,12 @@ function Sala() {
     socketRef.current.emit("eliminarSala")
   }
 
-  const iniciarJuego = () => {
-    socketRef.current.emit("iniciarJuego")
+  const crearJuego = () => {
+    socketRef.current.emit("crearJuego")
+  }
+
+  const irJuego = nombrejuego => {
+    navigate(`/mapa/${nombrejuego}`)
   }
 
   useEffect(() => {
@@ -77,7 +82,7 @@ function Sala() {
         setUsuarios(usuarios)
       })
 
-      socketRef.current.on('jugador', user => {
+      socketRef.current.on('user', user => {
         setUser(user)
       })
   
@@ -125,7 +130,7 @@ function Sala() {
             salas.includes(user.usuario && user.usuario.email) ?
               <>
                 <Button variant="danger" onClick={eliminarSala} disabled={isLoading}>Eliminar sala</Button>
-                <Button variant="warning" onClick={iniciarJuego} disabled={isLoading}>Iniciar juego</Button>
+                <Button variant="warning" onClick={crearJuego} disabled={isLoading}>Iniciar juego</Button>
               </> :
               <Button variant="danger" onClick={salirSala} disabled={isLoading}>Salir sala</Button>
           }
@@ -144,10 +149,25 @@ function Sala() {
           <ul id="chat"></ul>
           <Form onSubmit={enviarMensaje}>
             <Form.Group controlId="formBasicEmail">
-              <Form.Control placeholder="Ingrese su manesaje" name="email" onChange={handleTexto} />
+              <Form.Control placeholder="Ingrese su manesaje" name="texto" value={texto} onChange={handleTexto} />
             </Form.Group>
             <Button variant="info" type="submit" disabled={isLoading}>Enviar</Button>
           </Form>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h2>Juegos</h2>
+          <ListGroup variant="flush">
+            {
+              user.usuario &&user.juegos.map(j => 
+                  <ListGroup.Item key={j}>
+                    {j}
+                    <Button variant="warning" onClick={() => irJuego(j)} disabled={isLoading}>Ir al juego</Button>
+                  </ListGroup.Item>
+              )
+            }
+          </ListGroup>
         </Col>
       </Row>
     </Container>
