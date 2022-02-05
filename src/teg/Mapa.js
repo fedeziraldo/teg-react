@@ -198,14 +198,14 @@ function Mapa() {
                   x={p.pais.posX}
                   y={p.pais.posY}
                   text={`fichas: ${p.fichas}`}
-                  onClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
+                  onPointerClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
                 >
                 </Text>
                 <Text
                   x={p.pais.posX}
                   y={p.pais.posY + 20}
                   text={`misiles: ${p.misiles}`}
-                  onClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
+                  onPointerClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
                 >
                 </Text>
               </Fragment>)
