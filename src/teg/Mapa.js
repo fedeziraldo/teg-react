@@ -17,12 +17,6 @@ const colores = [
   { green: 255, blue: 255 },
 ]
 
-const styleMapa = {
-  backgroundImage: 'url("../mapa.jpg")',
-  width: '1600px',
-  height: '1182px'
-}
-
 const drawHitFromCache = (img, p) => {
   if (img) {
     img.cache();
@@ -37,6 +31,8 @@ const drawHitFromCache = (img, p) => {
 
 function Mapa() {
   const params = useParams();
+
+  const mapa = useImage('../mapa.jpg')[0]
 
   const images = {}
   images['ANGOLA.png'] = useImage('../ANGOLA.png')[0]
@@ -59,7 +55,7 @@ function Mapa() {
     paises: [],
     turno: {}
   })
-  
+
   const [ataque, setAtaque] = useState({})
 
   const [show, setShow] = useState(false)
@@ -177,7 +173,16 @@ function Mapa() {
       <Alert>
         Fichas restantes {jugador.fichasRestantes}
       </Alert>
-      <Stage width={1600} height={1182} style={styleMapa}>
+      <Stage width={1300} height={1182} draggable>
+        <Layer listening={false}>
+          <Image
+            image={mapa}
+            width={1600}
+            heigth={1182}
+            ref={node => node && node.cache()}
+            perfectDrawEnabled={false}
+          />
+        </Layer>
         <Layer>
           {
             juego.paises.map(p =>
@@ -188,9 +193,11 @@ function Mapa() {
                 ref={node => drawHitFromCache(node, p)}
                 width={p.pais.width || 200}
                 height={p.pais.height || 200}
+                perfectDrawEnabled={false}
               />)
           }
-
+        </Layer>
+        <Layer>
           {
             juego.paises.map(p =>
               <Fragment key={p.pais.numero}>
