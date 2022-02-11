@@ -34,8 +34,15 @@ function Mapa() {
 
   const mapa = useImage('../mapa.jpg')[0]
 
+
+  // for (let i=0; i<72; i++) {
+  //   imageRefs.push(useRef())
+  // }
+
   const images = {}
-  images['ANGOLA.png'] = useImage('../ANGOLA.png')[0]
+  const angola = useImage('../ANGOLA.png')[0]
+  const imageRef = useRef()
+  images['ANGOLA.png'] = angola
   images['EGIPTO.png'] = useImage('../EGIPTO.png')[0]
   images['ETIOPIA.png'] = useImage('../ETIOPIA.png')[0]
   images['MADAGASCAR.png'] = useImage('../MADAGASCAR.png')[0]
@@ -45,6 +52,18 @@ function Mapa() {
   images['SUDAFRICA.png'] = useImage('../SUDAFRICA.png')[0]
   images['CUBA.png'] = useImage('../CUBA.png')[0]
   images['EL_SALVADOR.png'] = useImage('../EL_SALVADOR.png')[0]
+
+  useEffect(() => {
+    if (angola) {
+      imageRef.current.cache();
+      // const color = colores[p.jugador.numero]
+      // color.red && imageRef.current["red"](color.red)
+      // color.green && imageRef.current["green"](color.green)
+      // color.blue && imageRef.current["blue"](color.blue)
+      imageRef.current.drawHitFromCache();
+      imageRef.current.getLayer().batchDraw();
+    }
+  }, [angola]);
 
   const socketRef = useRef()
 
@@ -184,16 +203,35 @@ function Mapa() {
           />
         </Layer>
         <Layer>
+          <Image key={0}
+            x={200}
+            y={200}
+            image={angola}
+            //ref={node => drawHitFromCache(node, p)}
+            width={ 200}
+            height={ 200}
+            perfectDrawEnabled={false}
+            ref={imageRef}
+            filters={[Konva.Filters.RGB]}
+            red={colores[0].red}
+            green={colores[0].green}
+            blue={colores[0].blue}
+          />
           {
             juego.paises.map(p =>
               <Image key={p.pais.numero}
                 x={p.pais.posX}
                 y={p.pais.posY}
                 image={images[p.pais.archivo]}
-                ref={node => drawHitFromCache(node, p)}
+                //ref={node => drawHitFromCache(node, p)}
                 width={p.pais.width || 200}
                 height={p.pais.height || 200}
                 perfectDrawEnabled={false}
+                ref={imageRef}
+                filters={[Konva.Filters.RGB]}
+                red={colores[0].red}
+                green={colores[0].green}
+                blue={colores[0].blue}
               />)
           }
         </Layer>
