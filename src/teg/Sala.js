@@ -15,8 +15,8 @@ function Sala() {
   const [salas, setSalas] = useState([]);
   const [isLoading, setLoading] = useState(true)
 
-  const handleTexto = e => {
-    setTexto(e.target.value);
+  const handleTexto = (event) => {
+    setTexto(event.target.value);
   };
 
   const enviarMensaje = e => {
@@ -61,14 +61,14 @@ function Sala() {
 
     const initSocket = () => {
       socketRef.current = socketIOClient(`${ENDPOINT}/sala`)
-
+  
       socketRef.current.emit('validacion', localStorage.getItem("token"))
-
+  
       socketRef.current.on('loginIncorrecto', () => {
         localStorage.removeItem("token");
         navigate("/")
       })
-
+  
       socketRef.current.on('loginCorrecto', user => {
         setUser(user)
         setLoading(false)
@@ -85,7 +85,7 @@ function Sala() {
       socketRef.current.on('user', user => {
         setUser(user)
       })
-
+  
       socketRef.current.on("texto", texto => {
         document.getElementById("chat").innerHTML += `<li>${texto}</li>`
       })
@@ -119,21 +119,21 @@ function Sala() {
           <h3>Estas unido a la sala {user.nombreSala}</h3>
           <ListGroup variant="flush">
             {
-              Object.keys(salas).map(s =>
-                <ListGroup.Item key={salas[s].creador.usuario.email}>{salas[s].creador.usuario.email} {salas[s].participantes.length}
-                  <Button variant="primary" onClick={() => unirseSala(salas[s].creador.usuario.email)} disabled={isLoading}>Unirse a sala</Button>
-                </ListGroup.Item>
-              )}
+              Object.keys(salas).map(s => 
+              <ListGroup.Item key={s}>{s}
+                <Button variant="primary" onClick={() => unirseSala(s)} disabled={isLoading}>Unirse a sala</Button>
+              </ListGroup.Item>
+            )}
           </ListGroup>
           <Button variant="success" onClick={crearSala} disabled={isLoading}>Crear sala</Button>
-            {
-              Object.keys(salas).map(s => salas[s].creador.usuario.email).includes(user.usuario && user.usuario.email) ?
-                <>
-                  <Button variant="danger" onClick={eliminarSala} disabled={isLoading}>Eliminar sala</Button>
-                  <Button variant="warning" onClick={crearJuego} disabled={isLoading}>Iniciar juego</Button>
-                </> :
-                <Button variant="danger" onClick={salirSala} disabled={isLoading}>Salir sala</Button>
-            }
+          {
+            Object.keys(salas).includes(user.usuario && user.usuario.email) ?
+              <>
+                <Button variant="danger" onClick={eliminarSala} disabled={isLoading}>Eliminar sala</Button>
+                <Button variant="warning" onClick={crearJuego} disabled={isLoading}>Iniciar juego</Button>
+              </> :
+              <Button variant="danger" onClick={salirSala} disabled={isLoading}>Salir sala</Button>
+          }
         </Col>
       </Row>
       <Row>
@@ -157,14 +157,14 @@ function Sala() {
       </Row>
       <Row>
         <Col>
-          <h2>Jugando</h2>
+          <h2>Juegos</h2>
           <ListGroup variant="flush">
             {
-              user.juegos && user.juegos.map(j =>
-                <ListGroup.Item key={j}>
-                  {j}
-                  <Button variant="warning" onClick={() => irJuego(j)} disabled={isLoading}>Ir al juego</Button>
-                </ListGroup.Item>
+              user.usuario &&user.juegos.map(j => 
+                  <ListGroup.Item key={j}>
+                    {j}
+                    <Button variant="warning" onClick={() => irJuego(j)} disabled={isLoading}>Ir al juego</Button>
+                  </ListGroup.Item>
               )
             }
           </ListGroup>

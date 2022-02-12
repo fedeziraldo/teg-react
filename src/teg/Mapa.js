@@ -1,50 +1,17 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Image, Text } from 'react-konva';
 import { useNavigate, useParams } from 'react-router-dom';
-import Konva from 'konva';
+import Pais from './Pais'
 import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
 import { Alert, Button, Form, ListGroup, Container } from 'react-bootstrap';
 import JugadaInvalida from './JugadaInvalida';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
-const colores = [
-  { red: 255 },
-  { green: 255 },
-  { blue: 255 },
-  { red: 255, green: 255 },
-  { red: 255, blue: 255 },
-  { green: 255, blue: 255 },
-]
-
-const drawHitFromCache = (img, p) => {
-  if (img) {
-    img.cache();
-    img.filters([Konva.Filters.RGB]);
-    const color = colores[p.jugador.numero]
-    color.red && img["red"](color.red)
-    color.green && img["green"](color.green)
-    color.blue && img["blue"](color.blue)
-    img.drawHitFromCache();
-  }
-};
-
 function Mapa() {
   const params = useParams();
 
-  const mapa = useImage('../mapa.jpg')[0]
-
-  const images = {}
-  images['ANGOLA.png'] = useImage('../ANGOLA.png')[0]
-  images['EGIPTO.png'] = useImage('../EGIPTO.png')[0]
-  images['ETIOPIA.png'] = useImage('../ETIOPIA.png')[0]
-  images['MADAGASCAR.png'] = useImage('../MADAGASCAR.png')[0]
-  images['MAURITANIA.png'] = useImage('../MAURITANIA.png')[0]
-  images['NIGERIA.png'] = useImage('../NIGERIA.png')[0]
-  images['SAHARA.png'] = useImage('../SAHARA.png')[0]
-  images['SUDAFRICA.png'] = useImage('../SUDAFRICA.png')[0]
-  images['CUBA.png'] = useImage('../CUBA.png')[0]
-  images['EL_SALVADOR.png'] = useImage('../EL_SALVADOR.png')[0]
+  const [mapa] = useImage('../mapa.jpg')
 
   const socketRef = useRef()
 
@@ -179,40 +146,30 @@ function Mapa() {
             image={mapa}
             width={1600}
             heigth={1182}
-            ref={node => node && node.cache()}
             perfectDrawEnabled={false}
           />
         </Layer>
         <Layer>
           {
-            juego.paises.map(p =>
-              <Image key={p.pais.numero}
-                x={p.pais.posX}
-                y={p.pais.posY}
-                image={images[p.pais.archivo]}
-                ref={node => drawHitFromCache(node, p)}
-                width={p.pais.width || 200}
-                height={p.pais.height || 200}
-                perfectDrawEnabled={false}
-              />)
+            juego.paises.map(pais => <Pais pais={pais} key={pais.pais.numero}/>)
           }
         </Layer>
         <Layer>
           {
-            juego.paises.map(p =>
-              <Fragment key={p.pais.numero}>
+            juego.paises.map(pais =>
+              <Fragment key={pais.pais.numero}>
                 <Text
-                  x={p.pais.posX}
-                  y={p.pais.posY}
-                  text={`fichas: ${p.fichas}`}
-                  onPointerClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
+                  x={pais.pais.posX}
+                  y={pais.pais.posY}
+                  text={`fichas: ${pais.fichas}`}
+                  onPointerClick={() => socketRef.current.emit('accionSimple', pais.pais.numero, false)}
                 >
                 </Text>
                 <Text
-                  x={p.pais.posX}
-                  y={p.pais.posY + 20}
-                  text={`misiles: ${p.misiles}`}
-                  onPointerClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
+                  x={pais.pais.posX}
+                  y={pais.pais.posY + 20}
+                  text={`misiles: ${pais.misiles}`}
+                  onPointerClick={() => socketRef.current.emit('accionSimple', pais.pais.numero, false)}
                 >
                 </Text>
               </Fragment>)
