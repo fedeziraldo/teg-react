@@ -6,6 +6,7 @@ import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
 import { Alert, Button, Form, ListGroup, Container } from 'react-bootstrap';
 import JugadaInvalida from './JugadaInvalida';
+import paises from '../paises.json'
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 const colores = [
@@ -35,35 +36,43 @@ function Mapa() {
   const mapa = useImage('../mapa.jpg')[0]
 
 
-  // for (let i=0; i<72; i++) {
+  // const imageRefs = []
+  // const images = []
+  // for (let pais of paises) {
+  //   images.push(useImage(`../${pais}.png`)[0])
   //   imageRefs.push(useRef())
   // }
 
-  const images = {}
+  // const images = {}
   const angola = useImage('../ANGOLA.png')[0]
-  const imageRef = useRef()
+  const angolaRef = useRef()
   images['ANGOLA.png'] = angola
-  images['EGIPTO.png'] = useImage('../EGIPTO.png')[0]
-  images['ETIOPIA.png'] = useImage('../ETIOPIA.png')[0]
-  images['MADAGASCAR.png'] = useImage('../MADAGASCAR.png')[0]
-  images['MAURITANIA.png'] = useImage('../MAURITANIA.png')[0]
-  images['NIGERIA.png'] = useImage('../NIGERIA.png')[0]
-  images['SAHARA.png'] = useImage('../SAHARA.png')[0]
-  images['SUDAFRICA.png'] = useImage('../SUDAFRICA.png')[0]
-  images['CUBA.png'] = useImage('../CUBA.png')[0]
-  images['EL_SALVADOR.png'] = useImage('../EL_SALVADOR.png')[0]
+  const etiopia = useImage('../ETIOPIA.png')[0]
+  images['ETIOPIA.png'] = etiopia
+  const etiopiaRef = useRef()
+  // images['MADAGASCAR.png'] = useImage('../MADAGASCAR.png')[0]
+  // images['MAURITANIA.png'] = useImage('../MAURITANIA.png')[0]
+  // images['NIGERIA.png'] = useImage('../NIGERIA.png')[0]
+  // images['SAHARA.png'] = useImage('../SAHARA.png')[0]
+  // images['SUDAFRICA.png'] = useImage('../SUDAFRICA.png')[0]
+  // images['CUBA.png'] = useImage('../CUBA.png')[0]
+  // images['EL_SALVADOR.png'] = useImage('../EL_SALVADOR.png')[0]
 
   useEffect(() => {
     if (angola) {
-      imageRef.current.cache();
-      // const color = colores[p.jugador.numero]
-      // color.red && imageRef.current["red"](color.red)
-      // color.green && imageRef.current["green"](color.green)
-      // color.blue && imageRef.current["blue"](color.blue)
-      imageRef.current.drawHitFromCache();
-      imageRef.current.getLayer().batchDraw();
+      angolaRef.current.cache();
+      angolaRef.current.drawHitFromCache();
+      angolaRef.current.getLayer().batchDraw();
     }
   }, [angola]);
+
+  useEffect(() => {
+    if (etiopia) {
+      etiopiaRef.current.cache();
+      etiopiaRef.current.drawHitFromCache();
+      etiopiaRef.current.getLayer().batchDraw();
+    }
+  }, [etiopia]);
 
   const socketRef = useRef()
 
@@ -211,27 +220,41 @@ function Mapa() {
             width={ 200}
             height={ 200}
             perfectDrawEnabled={false}
-            ref={imageRef}
+            ref={angolaRef}
             filters={[Konva.Filters.RGB]}
-            red={colores[0].red}
-            green={colores[0].green}
-            blue={colores[0].blue}
+            red={colores[1].red}
+            green={colores[1].green}
+            blue={colores[1].blue}
+          />
+          <Image key={0}
+            x={400}
+            y={400}
+            image={etiopia}
+            //ref={node => drawHitFromCache(node, p)}
+            width={ 200}
+            height={ 200}
+            perfectDrawEnabled={false}
+            ref={etiopiaRef}
+            filters={[Konva.Filters.RGB]}
+            red={colores[2].red}
+            green={colores[2].green}
+            blue={colores[2].blue}
           />
           {
             juego.paises.map(p =>
               <Image key={p.pais.numero}
                 x={p.pais.posX}
                 y={p.pais.posY}
-                image={images[p.pais.archivo]}
+                image={images[p.pais.numero-1]}
                 //ref={node => drawHitFromCache(node, p)}
                 width={p.pais.width || 200}
                 height={p.pais.height || 200}
                 perfectDrawEnabled={false}
-                ref={imageRef}
+                ref={imageRefs[p.pais.numero-1]}
                 filters={[Konva.Filters.RGB]}
-                red={colores[0].red}
-                green={colores[0].green}
-                blue={colores[0].blue}
+                red={colores[p.jugador.numero].red}
+                green={colores[p.jugador.numero].green}
+                blue={colores[p.jugador.numero].blue}
               />)
           }
         </Layer>
