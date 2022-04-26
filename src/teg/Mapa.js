@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Image, Text } from 'react-konva';
 import { useNavigate, useParams } from 'react-router-dom';
-import Konva from 'konva';
+import Pais from './Pais'
 import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
 import { Alert, Button, Form, ListGroup, Container } from 'react-bootstrap';
@@ -173,7 +173,6 @@ function Mapa() {
             image={mapa}
             width={1600}
             heigth={1182}
-            ref={node => node && node.cache()}
             perfectDrawEnabled={false}
           />
         </Layer>
@@ -210,20 +209,20 @@ function Mapa() {
         </Layer>
         <Layer>
           {
-            juego.paises.map(p =>
-              <Fragment key={p.pais.numero}>
+            juego.paises.map(pais =>
+              <Fragment key={pais.pais.numero}>
                 <Text
-                  x={p.pais.posX}
-                  y={p.pais.posY}
-                  text={`fichas: ${p.fichas}`}
-                  onPointerClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
+                  x={pais.pais.posX}
+                  y={pais.pais.posY}
+                  text={`fichas: ${pais.fichas}`}
+                  onPointerClick={() => socketRef.current.emit('accionSimple', pais.pais.numero, false)}
                 >
                 </Text>
                 <Text
-                  x={p.pais.posX}
-                  y={p.pais.posY + 20}
-                  text={`misiles: ${p.misiles}`}
-                  onPointerClick={() => socketRef.current.emit('accionSimple', p.pais.numero, false)}
+                  x={pais.pais.posX}
+                  y={pais.pais.posY + 20}
+                  text={`misiles: ${pais.misiles}`}
+                  onPointerClick={() => socketRef.current.emit('accionSimple', pais.pais.numero, false)}
                 >
                 </Text>
               </Fragment>)
