@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Image, Text } from 'react-konva';
+import { Stage, Layer, Image, Text,  } from 'react-konva';
+import Konva from 'konva';
 import { useNavigate, useParams } from 'react-router-dom';
-import Pais from './Pais'
 import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
 import { Alert, Button, Form, ListGroup, Container } from 'react-bootstrap';
