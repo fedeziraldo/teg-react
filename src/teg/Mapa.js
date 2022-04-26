@@ -9,35 +9,18 @@ import JugadaInvalida from './JugadaInvalida';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 const colores = [
-  { red: 255 },
-  { green: 255 },
-  { blue: 255 },
-  { red: 255, green: 255 },
-  { red: 255, blue: 255 },
-  { green: 255, blue: 255 },
+  { red: 255, green: 0, blue: 0 },
+  { red: 0, green: 255, blue: 0 },
+  { red: 0, green: 0, blue: 255 },
+  { red: 255, green: 255, blue: 0 },
+  { red: 255, green: 0, blue: 255 },
+  { red: 0, green: 255, blue: 255 },
 ]
-
-const drawHitFromCache = (img, p) => {
-  if (img) {
-    img.cache();
-    img.filters([Konva.Filters.RGB]);
-    const color = colores[p.jugador.numero]
-    color.red && img["red"](color.red)
-    color.green && img["green"](color.green)
-    color.blue && img["blue"](color.blue)
-    img.drawHitFromCache();
-  }
-};
 
 function Mapa() {
   const params = useParams();
 
   const mapa = useImage('../mapa.jpg')[0]
-
-
-  // for (let i=0; i<72; i++) {
-  //   imageRefs.push(useRef())
-  // }
 
   const images = {}
   const angola = useImage('../ANGOLA.png')[0]
@@ -56,10 +39,6 @@ function Mapa() {
   useEffect(() => {
     if (angola) {
       imageRef.current.cache();
-      // const color = colores[p.jugador.numero]
-      // color.red && imageRef.current["red"](color.red)
-      // color.green && imageRef.current["green"](color.green)
-      // color.blue && imageRef.current["blue"](color.blue)
       imageRef.current.drawHitFromCache();
       imageRef.current.getLayer().batchDraw();
     }
@@ -105,30 +84,26 @@ function Mapa() {
   };
 
   useEffect(() => {
-    const initSocket = () => {
-      socketRef.current = socketIOClient(`${ENDPOINT}/mapa`)
+    socketRef.current = socketIOClient(`${ENDPOINT}/mapa`)
 
-      socketRef.current.emit('validacion', localStorage.getItem("token"), params.nombreJuego)
+    socketRef.current.emit('validacion', localStorage.getItem("token"), params.nombreJuego)
 
-      socketRef.current.on('loginIncorrecto', () => {
-        navigate("/sala")
-      })
+    socketRef.current.on('loginIncorrecto', () => {
+      navigate("/sala")
+    })
 
-      socketRef.current.on('loginCorrecto', jugador => {
-        setJugador(jugador)
-      })
+    socketRef.current.on('loginCorrecto', jugador => {
+      setJugador(jugador)
+    })
 
-      socketRef.current.on('juego', juego => {
-        setJuego(juego)
-      })
+    socketRef.current.on('juego', juego => {
+      setJuego(juego)
+    })
 
-      socketRef.current.on('jugadaInvalida', mensaje => {
-        setShow(true)
-        setJugadaInvalida(mensaje)
-      })
-    }
-
-    initSocket()
+    socketRef.current.on('jugadaInvalida', mensaje => {
+      setShow(true)
+      setJugadaInvalida(mensaje)
+    })
 
     return () => {
       socketRef.current.disconnect();
@@ -207,9 +182,8 @@ function Mapa() {
             x={200}
             y={200}
             image={angola}
-            //ref={node => drawHitFromCache(node, p)}
-            width={ 200}
-            height={ 200}
+            width={200}
+            height={200}
             perfectDrawEnabled={false}
             ref={imageRef}
             filters={[Konva.Filters.RGB]}
@@ -223,9 +197,8 @@ function Mapa() {
                 x={p.pais.posX}
                 y={p.pais.posY}
                 image={images[p.pais.archivo]}
-                //ref={node => drawHitFromCache(node, p)}
-                width={p.pais.width || 200}
-                height={p.pais.height || 200}
+                width={p.pais.width}
+                height={p.pais.height}
                 perfectDrawEnabled={false}
                 ref={imageRef}
                 filters={[Konva.Filters.RGB]}
