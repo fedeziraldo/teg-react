@@ -3,10 +3,11 @@ import { Stage, Layer, Image } from 'react-konva';
 import { useNavigate, useParams } from 'react-router-dom';
 import socketIOClient from "socket.io-client";
 import useImage from 'use-image';
-import { Alert, Button, Form, ListGroup, Container } from 'react-bootstrap';
+import { Alert, Button, ListGroup, Container } from 'react-bootstrap';
 import JugadaInvalida from './JugadaInvalida';
 import Pais from './Pais';
 import Ficha from './Ficha';
+import Ataque from './Ataque';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 function Mapa() {
@@ -24,25 +25,14 @@ function Mapa() {
     turno: {}
   })
 
-  const [ataque, setAtaque] = useState({})
-
+  const [paisSelected, setPaisSelected] = useState(0)
+  const [showAtaque, setShowAtaque] = useState(false)
   const [showJugadaInvalida, setShowJugadaInvalida] = useState(false)
   const [jugadaInvalida, setJugadaInvalida] = useState("")
   const navigate = useNavigate()
 
-  const handleAtaque = e => {
-    const a = { ...ataque }
-    a[e.target.name] = e.target.value
-    setAtaque(a);
-  };
-
   const accionTerminarTurno = () => {
     socketRef.current.emit('accionTerminarTurno')
-  };
-
-  const atacar = e => {
-    e.preventDefault()
-    socketRef.current.emit('accionDoble', ataque.numeroPaisO, ataque.numeroPaisD)
   };
 
   const botonEmpate = nombreJuego => {
@@ -94,21 +84,6 @@ function Mapa() {
         }
       </ListGroup>
       <Button variant="danger" onClick={accionTerminarTurno}>Terminar turno</Button>
-      <Form onSubmit={atacar}>
-        <Form.Select name="numeroPaisO" onChange={handleAtaque}>
-          {
-            juego.paises.map(p => <option value={p.pais.numero} key={p.pais.numero}>{p.pais.nombre}</option>)
-          }
-        </Form.Select>
-
-        <Form.Select name="numeroPaisD" onChange={handleAtaque}>
-          {
-            juego.paises.map(p => <option value={p.pais.numero} key={p.pais.numero}>{p.pais.nombre}</option>)
-          }
-        </Form.Select>
-
-        <Button variant="info" type="submit" onClick={atacar}>Ataca</Button>
-      </Form>
       <Alert>
 
         Fase {
@@ -146,9 +121,10 @@ function Mapa() {
         <Layer>
           {
             juego.paises.map(p =>
-              <Pais
-                key={p.pais.numero}
+              <Pais key={p.pais.numero}
                 pais={p}
+                setShowAtaque={setShowAtaque}
+                setPaisSelected={setPaisSelected}
               />)
           }
         </Layer>
@@ -163,13 +139,20 @@ function Mapa() {
           }
         </Layer>
       </Stage>
+      <Button variant="warning" onClick={volverASala}>Volver a sala</Button>
+      <Button variant="danger" onClick={() => botonEmpate(params.nombreJuego)}>Boton empate</Button>
+      <Ataque
+        paises={juego.paises}
+        paisSelected={paisSelected}
+        show={showAtaque}
+        setShow={setShowAtaque}
+        socketRef={socketRef}
+      />
       <JugadaInvalida
         mensaje={jugadaInvalida}
         show={showJugadaInvalida}
         setShow={setShowJugadaInvalida}
       />
-      <Button variant="warning" onClick={volverASala}>Volver a sala</Button>
-      <Button variant="danger" onClick={() => botonEmpate(params.nombreJuego)}>Boton empate</Button>
     </Container>
   )
 }

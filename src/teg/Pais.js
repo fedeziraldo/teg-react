@@ -12,7 +12,7 @@ const colores = [
   { red: 0, green: 255, blue: 255 },
 ]
 
-function Pais({ pais }) {
+function Pais({ pais, setShowAtaque, setPaisSelected }) {
   const [image] = useImage(`../paises/${pais.pais.archivo}`)
   const paisRef = useRef()
 
@@ -22,6 +22,11 @@ function Pais({ pais }) {
       paisRef.current.drawHitFromCache();
     }
   }, [image]);
+
+  const seleccionarJugada = numero => {
+    setPaisSelected(numero)
+    setShowAtaque(true)
+  }
 
   return (
     <Image
@@ -33,6 +38,7 @@ function Pais({ pais }) {
       red={colores[pais.jugador.numero].red}
       green={colores[pais.jugador.numero].green}
       blue={colores[pais.jugador.numero].blue}
+      onPointerClick={() => seleccionarJugada(pais.pais.numero)}
     />
   )
 }
