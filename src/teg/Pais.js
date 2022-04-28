@@ -50,7 +50,7 @@ function Pais({ pais, setShowAtaque, setPaisSelected, socketRef }) {
         x={image && (pais.pais.posX + image.width / 2 - 10)}
         y={image && (pais.pais.posY + image.height / 2 - 5)}
         text={`${pais.fichas} - ${pais.misiles}`}
-        onPointerClick={e => socketRef.current.emit('accionSimple', pais.pais.numero, e.evt.button != 1)}
+        onPointerClick={e => socketRef.current.emit('accionSimple', pais.pais.numero, e.evt.button !== 1)}
       />
       
     </>
