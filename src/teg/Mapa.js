@@ -6,7 +6,6 @@ import useImage from 'use-image';
 import { Alert, Button, ListGroup, Container } from 'react-bootstrap';
 import JugadaInvalida from './JugadaInvalida';
 import Pais from './Pais';
-import Ficha from './Ficha';
 import Ataque from './Ataque';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
@@ -125,17 +124,8 @@ function Mapa() {
                 pais={p}
                 setShowAtaque={setShowAtaque}
                 setPaisSelected={setPaisSelected}
-              />)
-          }
-        </Layer>
-        <Layer>
-          {
-            juego.paises.map(pais =>
-              <Ficha key={pais.pais.numero}
-                pais={pais}
                 socketRef={socketRef}
-              />
-            )
+              />)
           }
         </Layer>
       </Stage>
