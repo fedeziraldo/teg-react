@@ -4,16 +4,16 @@ import { Image } from 'react-konva';
 import useImage from 'use-image';
 
 const colores = [
-  { red: 255 },
-  { green: 255 },
-  { blue: 255 },
-  { red: 255, green: 255 },
-  { red: 255, blue: 255 },
-  { green: 255, blue: 255 },
+  { red: 255, green: 0, blue: 0 },
+  { red: 0, green: 255, blue: 0 },
+  { red: 0, green: 0, blue: 255 },
+  { red: 255, green: 255, blue: 0 },
+  { red: 255, green: 0, blue: 255 },
+  { red: 0, green: 255, blue: 255 },
 ]
 
 function Pais({ pais }) {
-  const image = useImage(`../${pais.pais.archivo}`)[0]
+  const [image] = useImage(`../paises/${pais.pais.archivo}`)
   const paisRef = useRef()
 
   useEffect(() => {
@@ -28,9 +28,6 @@ function Pais({ pais }) {
       x={pais.pais.posX}
       y={pais.pais.posY}
       image={image}
-      width={pais.pais.width || 200}
-      height={pais.pais.height || 200}
-      perfectDrawEnabled={false}
       ref={paisRef}
       filters={[Konva.Filters.RGB]}
       red={colores[pais.jugador.numero].red}
