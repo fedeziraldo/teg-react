@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import socketIOClient from "socket.io-client";
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Form, Button, Row, Col, ListGroup } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
@@ -55,10 +54,6 @@ function Sala() {
   }
 
   useEffect(() => {
-    const getUsuarios = async () => {
-      console.log(await axios.get(`${ENDPOINT}/usuarios`))
-    }
-
     const initSocket = () => {
       socketRef.current = socketIOClient(`${ENDPOINT}/sala`)
   
@@ -95,7 +90,6 @@ function Sala() {
       })
     }
 
-    getUsuarios()
     initSocket()
 
     return () => {
