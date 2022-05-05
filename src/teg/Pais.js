@@ -47,11 +47,12 @@ function Pais({ pais, setShowAtaque, setPaisSelected, socketRef }) {
           <Circle
             x={pais.pais.posX + image.width / 2}
             y={pais.pais.posY + image.height / 2}
-            radius={20} fill="white"
+            radius={20} 
+            fill="white"
             onPointerClick={e => socketRef.current.emit('accionSimple', pais.pais.numero, e.evt.button !== 0)}
           />
           <Text
-            x={pais.pais.posX + image.width / 2 - 10}
+            x={pais.pais.posX + image.width / 2 - 15}
             y={pais.pais.posY + image.height / 2 - 5}
             text={`${pais.fichas} - ${pais.misiles}`}
           />

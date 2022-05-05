@@ -7,6 +7,7 @@ import { Alert, Button, ListGroup, Container } from 'react-bootstrap';
 import JugadaInvalida from './JugadaInvalida';
 import Pais from './Pais';
 import Ataque from './Ataque';
+import Tarjetas from './Tarjetas';
 const ENDPOINT = process.env.REACT_APP_BACK;
 
 function Mapa() {
@@ -18,20 +19,21 @@ function Mapa() {
 
   const [jugador, setJugador] = useState({})
 
-  const [juego, setJuego] = useState({
-    jugadores: [],
-    paises: [],
-    turno: {}
-  })
+  const [juego, setJuego] = useState(null)
 
   const [paisSelected, setPaisSelected] = useState(0)
   const [showAtaque, setShowAtaque] = useState(false)
+  const [showTarjetas, setShowTarjetas] = useState(false)
   const [showJugadaInvalida, setShowJugadaInvalida] = useState(false)
   const [jugadaInvalida, setJugadaInvalida] = useState("")
   const navigate = useNavigate()
 
   const accionTerminarTurno = () => {
     socketRef.current.emit('accionTerminarTurno')
+  };
+
+  const verTarjetas = () => {
+    setShowTarjetas(true)
   };
 
   const botonEmpate = nombreJuego => {
@@ -79,37 +81,40 @@ function Mapa() {
       Hola {jugador.nombre}
       <ListGroup variant="flush">
         {
-          juego.jugadores.map(j => <ListGroup.Item key={j.nombre}>{j.nombre}</ListGroup.Item>)
+          juego?.jugadores.map(j => <ListGroup.Item key={j.nombre}>{j.nombre}</ListGroup.Item>)
         }
       </ListGroup>
       <Button variant="danger" onClick={accionTerminarTurno}>Terminar turno</Button>
+      <Button variant="success" onClick={verTarjetas}>Canje</Button>
       <Alert>
 
-        Fase {
-          juego.turno.faseInicial && "Inicial"
+        Fase: {
+          juego?.turno.faseInicial && "Inicial"
         }
         {
-          juego.turno.fase4 && "4"
+          juego?.turno.fase4 && "4"
         }
         {
-          juego.turno.fase8 && "8"
+          juego?.turno.fase8 && "8"
         }
         {
-          juego.turno.faseJuego && "Juego"
+          juego?.turno.faseJuego && "Juego"
         }
         {
-          juego.turno.faseReagrupar && "Reagrupar"
+          juego?.turno.faseReagrupar && "Reagrupar"
         }
         {
-          juego.turno.faseRefuerzos && "Refuerzos"
+          juego?.turno.faseRefuerzos && "Refuerzos"
         }
       </Alert>
       <Alert>
-        Turno {juego.jugadores[juego.turno.turno % juego.jugadores.length] &&
-          juego.jugadores[juego.turno.turno % juego.jugadores.length].nombre}
+        Turno: {juego?.jugadores[juego?.turno.turno % juego?.jugadores.length].nombre}
       </Alert>
       <Alert>
-        Fichas restantes {jugador.fichasRestantes}
+        Fichas restantes: {jugador.fichasRestantes}
+      </Alert>
+      <Alert>
+        Objetivo secreto: {jugador.objetivo?.nombre}
       </Alert>
       <Stage width={1300} height={1182} draggable>
         <Layer listening={false}>
@@ -119,7 +124,7 @@ function Mapa() {
         </Layer>
         <Layer>
           {
-            juego.paises.map(p =>
+            juego?.paises.map(p =>
               <Pais key={p.pais.numero}
                 pais={p}
                 setShowAtaque={setShowAtaque}
@@ -131,8 +136,14 @@ function Mapa() {
       </Stage>
       <Button variant="warning" onClick={volverASala}>Volver a sala</Button>
       <Button variant="danger" onClick={() => botonEmpate(params.nombreJuego)}>Boton empate</Button>
+      <Tarjetas
+        jugador={jugador}
+        show={showTarjetas}
+        setShow={setShowTarjetas}
+        socketRef={socketRef}
+      />
       <Ataque
-        paises={juego.paises}
+        paises={juego?.paises}
         paisSelected={paisSelected}
         show={showAtaque}
         setShow={setShowAtaque}
