@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import socketIOClient from "socket.io-client";
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Form, Button, Row, Col, ListGroup } from 'react-bootstrap';
 const ENDPOINT = process.env.REACT_APP_BACK;
@@ -55,10 +54,6 @@ function Sala() {
   }
 
   useEffect(() => {
-    const getUsuarios = async () => {
-      console.log(await axios.get(`${ENDPOINT}/usuarios`))
-    }
-
     const initSocket = () => {
       socketRef.current = socketIOClient(`${ENDPOINT}/sala`)
   
@@ -95,7 +90,6 @@ function Sala() {
       })
     }
 
-    getUsuarios()
     initSocket()
 
     return () => {
@@ -111,7 +105,7 @@ function Sala() {
     <Container style={estilos}>
       <Row>
         <Col>
-          <h2>Hola {user.usuario && user.usuario.email}</h2>
+          <h2>Hola {user.usuario?.email}</h2>
           <Button variant="danger" onClick={logOut} disabled={isLoading}>Salir</Button>
         </Col>
         <Col>
@@ -127,7 +121,7 @@ function Sala() {
           </ListGroup>
           <Button variant="success" onClick={crearSala} disabled={isLoading}>Crear sala</Button>
           {
-            Object.keys(salas).includes(user.usuario && user.usuario.email) ?
+            Object.keys(salas).includes(user.usuario?.email) ?
               <>
                 <Button variant="danger" onClick={eliminarSala} disabled={isLoading}>Eliminar sala</Button>
                 <Button variant="warning" onClick={crearJuego} disabled={isLoading}>Iniciar juego</Button>

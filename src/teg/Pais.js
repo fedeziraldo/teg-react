@@ -41,18 +41,24 @@ function Pais({ pais, setShowAtaque, setPaisSelected, socketRef }) {
         blue={colores[pais.jugador.numero].blue}
         onPointerClick={() => seleccionarJugada(pais.pais.numero)}
       />
-      <Circle
-        x={image && (pais.pais.posX + (image.width) / 2)}
-        y={image && (pais.pais.posY + (image.height) / 2)}
-        radius={20} fill="white" 
-      />
-      <Text
-        x={image && (pais.pais.posX + image.width / 2 - 10)}
-        y={image && (pais.pais.posY + image.height / 2 - 5)}
-        text={`${pais.fichas} - ${pais.misiles}`}
-        onPointerClick={e => socketRef.current.emit('accionSimple', pais.pais.numero, e.evt.button !== 1)}
-      />
-      
+      {
+        image &&
+        <>
+          <Circle
+            x={pais.pais.posX + image.width / 2}
+            y={pais.pais.posY + image.height / 2}
+            radius={20} 
+            fill="white"
+            onPointerClick={e => socketRef.current.emit('accionSimple', pais.pais.numero, e.evt.button !== 0)}
+          />
+          <Text
+            x={pais.pais.posX + image.width / 2 - 15}
+            y={pais.pais.posY + image.height / 2 - 5}
+            text={`${pais.fichas} - ${pais.misiles}`}
+          />
+        </>
+      }
+
     </>
   )
 }
