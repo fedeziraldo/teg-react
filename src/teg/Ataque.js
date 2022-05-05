@@ -23,7 +23,7 @@ function Ataque({ paises, paisSelected, show, setShow, socketRef }) {
                 <Modal.Title>Ataque de {paises[paisSelected-1] && paises[paisSelected-1].pais.nombre} a:</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Select name="paisAtaque" onChange={handleAtaque}>
+                <Form.Select value={ataque} onChange={handleAtaque}>
                     {
                         paises.map(p => <option value={p.pais.numero} key={p.pais.numero}>{p.pais.nombre}</option>)
                     }
