@@ -116,6 +116,9 @@ function Mapa() {
       <Alert>
         Objetivo secreto: {jugador.objetivo?.nombre}
       </Alert>
+      <Alert>
+        Carta global: {juego?.cartaActual.tipo}
+      </Alert>
       <Stage width={1300} height={1182} draggable>
         <Layer listening={false}>
           <Image
