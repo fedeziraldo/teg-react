@@ -105,7 +105,7 @@ function Sala() {
     <Container style={estilos}>
       <Row>
         <Col>
-          <h2>Hola {user.usuario?.email}</h2>
+          <h2>Hoda {user.usuario?.email}</h2>
           <Button variant="danger" onClick={logOut} disabled={isLoading}>Salir</Button>
         </Col>
         <Col>
