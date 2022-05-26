@@ -120,6 +120,7 @@ function Sala() {
             )}
           </ListGroup>
           <Button variant="success" onClick={crearSala} disabled={isLoading}>Crear sala</Button>
+          <checkbox disabled={isLoading}>con robo Beba ?</checkbox>
           {
             Object.keys(salas).includes(user.usuario?.email) ?
               <>
