@@ -105,7 +105,7 @@ function Sala() {
     <Container style={estilos}>
       <Row>
         <Col>
-          <h2>Hola {user.usuario?.email}</h2>
+          <h2>Hoda {user.usuario?.email}</h2>
           <Button variant="danger" onClick={logOut} disabled={isLoading}>Salir</Button>
         </Col>
         <Col>
@@ -120,6 +120,7 @@ function Sala() {
             )}
           </ListGroup>
           <Button variant="success" onClick={crearSala} disabled={isLoading}>Crear sala</Button>
+          <checkbox disabled={isLoading}>con robo Beba ?</checkbox>
           {
             Object.keys(salas).includes(user.usuario?.email) ?
               <>
